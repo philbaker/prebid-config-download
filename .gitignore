@@ -1,6 +1,9 @@
 /node_modules
 .nrepl-port
 *.svg
+*.png
 .clj-kondo/
 .lsp/
 .nbb/
+config.edn
+prebid*.js

@@ -1,0 +1,3 @@
+{:prebid-version "7.38.0"
+ :prebid-adapters ["adWMG" "aja" "appnexus" "ablida"]
+ :file-prefix "prebid-v"}
