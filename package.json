@@ -6,7 +6,8 @@
   "author": "philbaker",
   "license": "MIT",
   "dependencies": {
-    "nbb": "^1.2.171"
+    "nbb": "^1.2.171",
+    "playwright": "^1.31.2"
   },
   "repository": {
     "type": "git",
