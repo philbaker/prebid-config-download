@@ -7,11 +7,13 @@
 
 (def config (read-string (str (fs/readFileSync "config.edn"))))
 
-(declare browser context page select select-version x download-file screenshot)
+(declare browser browser-ref context page select select-version x download-file download-event screenshot)
 
 (defn download []
   (defletp
+    (defp browser-ref (atom nil))
     (defp browser (.launch chromium #js {:headless false}))
+    (reset! browser-ref browser)
     (defp context (.newContext browser))
     (defp page (.newPage context))
     (.goto page "https://docs.prebid.org/download.html")
@@ -30,19 +32,16 @@
                                {:has (.locator page (str "text=" (get (:prebid-adapters config) x)))})
                      "input")
                    (.setChecked true)))))
-
-    (do
-      (-> (.waitForEvent page "download")
-          (.then (fn [download] (.path download)))
-          (.then (fn [x] (fs/copyFileSync x (str (:file-prefix config) (:prebid-version config) ".js")))))
+    (p/do 
+      (defp download-event
+            (p/-> (.waitForEvent page "download")
+                  (p/then (fn [download] (.path download)))
+                  (p/then (fn [x] (fs/copyFileSync x (str (:file-prefix config) (:prebid-version config) ".js"))))
+                  (p/then (fn [] (.screenshot page #js {:path "screenshot.png", :fullPage true})))
+                  (p/then (fn [] (.close @browser-ref)))))
       (defp download-file
         (p/-> (.locator page "button.btn.btn-lg.btn-primary")
               (.first)
-              (.click)))
-      (defp screenshot
-        (p/->
-          (.screenshot page #js {:path "screenshot.png", :fullPage true}))))))
+              (.click))))))
 
-(comment
-  (download)
-  )
+(download)
