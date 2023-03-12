@@ -6,7 +6,7 @@
 
 (declare browser context page select select-version x download-file)
 (def prebid-version "7.38.0")
-(def prebid-adapters ["adWMG" "medianet" "appnexus" "ablida"])
+(def prebid-adapters ["adWMG" "aja" "appnexus" "ablida"])
 
 (defn download []
   (defletp
@@ -24,8 +24,10 @@
         x
         (p/recur (- x 1)
                  (p/-> 
-                   (.locator page (str "input#" (get prebid-adapters x) "BidAdapter"))
-                   (.first)
+                   (.locator
+                     (.locator page ".adapters label" #js 
+                               {:has (.locator page (str "text=" (get prebid-adapters x)))})
+                     "input")
                    (.setChecked true)))))
 
     (do
