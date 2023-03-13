@@ -3,11 +3,10 @@ Uses [playwright](https://playwright.dev/) to download a custom version of prebi
 from https://docs.prebid.org/download
 
 ## Usage
-`npm i pb-config-dl`
+Create a config.edn file with your version, adapters, file prefix and whether
+the browser should be headless
 
-Create a config.edn file with the required version, adapters, modules and
-whether the browser should be headless. If no config.edn exists a file with
-the following config will be created
+If no config.edn file is found the following example config will be created
 
 ```clojure
 {:prebid-version "7.38.0" 
@@ -16,7 +15,7 @@ the following config will be created
  :headless false}
 ```
 
-run `pb-config-dl`
+To execute the script run `npx pb-config-dl` 
 
 prebid.js, a screenshot of the Prebid config from the browser and a log file are 
 saved to the /out directory
