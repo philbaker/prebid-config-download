@@ -1,5 +1,4 @@
 # Prebid config download
-
 Uses [playwright](https://playwright.dev/) to download a custom version of prebid
 from https://docs.prebid.org/download
 
