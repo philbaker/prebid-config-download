@@ -6,4 +6,6 @@
 .lsp/
 .nbb/
 config.edn
+log.edn
 prebid*.js
+output/

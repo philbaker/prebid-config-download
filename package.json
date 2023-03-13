@@ -1,6 +1,6 @@
 {
   "name": "prebid-config-download",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Downloads a custom version of prebid.js",
   "main": "index.mjs",
   "author": "philbaker",
