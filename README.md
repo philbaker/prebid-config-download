@@ -11,5 +11,5 @@ config.edn.example)
 
 run `prebid-config-download`
 
-prebid.js, a full page screenshot of the Prebid config and log with config information
-are saved to the /out directory
+prebid.js, a screenshot of the Prebid config from the browser and a log file are 
+saved to the /out directory
