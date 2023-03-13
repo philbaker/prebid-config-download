@@ -1,11 +1,7 @@
 /node_modules
 .nrepl-port
-*.svg
-*.png
 .clj-kondo/
 .lsp/
 .nbb/
 config.edn
-log.edn
-prebid*.js
 output/
