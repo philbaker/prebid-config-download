@@ -9,11 +9,12 @@
 (when-not (fs/existsSync "output")
   (fs/mkdirSync "output"))
 
-(when-not (fs/existsSync "config.edn") 
-  (fs/copyFileSync "config.edn.example" "config.edn"))
-
 (when-not (fs/existsSync "output/log.edn") 
-  (fs/copyFileSync "log.edn.example" "output/log.edn"))
+  (fs/writeFileSync "output/log.edn" ""))
+
+; Set up basic config if one doesn't exist
+(when-not (fs/existsSync "config.edn") 
+  (fs/writeFileSync "config.edn" "{:prebid-version \"7.38.0\" :prebid-adapters [\"adWMG\" \"aja\" \"ablida\"] :file-prefix \"prebid-\" :headless false}"))
 
 (def config (read-string (str (fs/readFileSync "config.edn"))))
 (def datetime (.toISOString (js/Date.)))
