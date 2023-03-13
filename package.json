@@ -1,7 +1,7 @@
 {
   "name": "prebid-config-download",
   "version": "0.1.0",
-  "description": "Downloads a custom version of prebid.js",
+  "description": "Uses Playwright to download a custom version of prebid.js",
   "main": "index.mjs",
   "author": "philbaker",
   "license": "MIT",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/philbaker/prebid-config-downloader.git"
+    "url": "https://github.com/philbaker/prebid-config-download.git"
   },
   "bin": {
     "svg-to-symbol": "index.mjs"
