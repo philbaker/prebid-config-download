@@ -17,19 +17,20 @@
 
 (def config (read-string (str (fs/readFileSync "config.edn"))))
 (def datetime (.toISOString (js/Date.)))
-(declare browser context page select select-version x download-file download-event)
+(declare browser context page select-version x download-file download-event)
 
 (defn download []
   (defletp
+    ; Browser setup
     (defp browser (.launch chromium #js {:headless (:headless config)}))
     (defp context (.newContext browser))
     (defp page (.newPage context))
     (.goto page "https://docs.prebid.org/download.html")
-    (defp select (p/-> (.locator page "select#version_selector")
-                       (.locator "option")
-                       (.allTextContents)))
+
     (defp select-version (p/-> (.locator page "select#version_selector")
                                (.selectOption (:prebid-version config))))
+
+    ; Check matched adapter checkboxes
     (p/loop [x (dec (count (:prebid-adapters config)))]
       (when (> x -1)
         x
@@ -41,6 +42,8 @@
                      "input")
                    (.first)
                    (.setChecked true)))))
+
+    ; Uncheck matched recommended module checkboxes
     (p/loop [x (dec (count (:recommended-modules-disable config)))]
       (when (> x -1)
         x
@@ -52,6 +55,8 @@
                      "input")
                    (.first)
                    (.setChecked true)))))
+
+    ; Check matched vendor specific module checkboxes
     (p/loop [x (dec (count (:vendor-specific-modules config)))]
       (when (> x -1)
         x
@@ -63,6 +68,8 @@
                      "input")
                    (.first)
                    (.setChecked true)))))
+
+    ; Download prebid file, take screenshot and append config info to logs
     (p/do 
       (defp download-event
         (p/-> (.waitForEvent page "download")
