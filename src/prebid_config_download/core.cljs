@@ -7,12 +7,12 @@
 
 (def config (read-string (str (fs/readFileSync "config.edn"))))
 
-(declare browser browser-ref context page select select-version x download-file download-event screenshot)
+(declare browser browser-ref context page select select-version x download-file download-event)
 
 (defn download []
   (defletp
     (defp browser-ref (atom nil))
-    (defp browser (.launch chromium #js {:headless false}))
+    (defp browser (.launch chromium #js {:headless (:headless config)}))
     (reset! browser-ref browser)
     (defp context (.newContext browser))
     (defp page (.newPage context))
@@ -38,7 +38,8 @@
                   (p/then (fn [download] (.path download)))
                   (p/then (fn [x] (fs/copyFileSync x (str (:file-prefix config) (:prebid-version config) ".js"))))
                   (p/then (fn [] (.screenshot page #js {:path "screenshot.png", :fullPage true})))
-                  (p/then (fn [] (.close @browser-ref)))))
+                  (p/then (fn [] (.close @browser-ref)))
+                  (p/then (fn [] (println "download complete")))))
       (defp download-file
         (p/-> (.locator page "button.btn.btn-lg.btn-primary")
               (.first)
