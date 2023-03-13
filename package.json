@@ -14,6 +14,6 @@
     "url": "https://github.com/philbaker/prebid-config-download.git"
   },
   "bin": {
-    "svg-to-symbol": "index.mjs"
+    "pb-config-dl": "index.mjs"
   }
 }
