@@ -55,7 +55,7 @@
                                {:has (.locator page (str "text=" (get (:recommended-modules-disable config) x)))})
                      "input")
                    (.first)
-                   (.setChecked true)))))
+                   (.setChecked false)))))
 
     ; Check matched vendor specific module checkboxes
     (p/loop [x (dec (count (:vendor-specific-modules config)))]
@@ -70,6 +70,19 @@
                    (.first)
                    (.setChecked true)))))
 
+    ; Check matched user id modules
+    (p/loop [x (dec (count (:vendor-specific-modules config)))]
+      (when (> x -1)
+        x
+        (p/recur (- x 1)
+                 (p/-> 
+                   (.locator
+                     (.locator page ".checkbox label" #js 
+                               {:has (.locator page (str "text=" (get (:user-id-modules config) x)))})
+                     "input")
+                   (.first)
+                   (.setChecked true)))))
+
     ; Download prebid file, take screenshot and append config info to logs
     (p/do 
       (defp download-event
@@ -78,6 +91,7 @@
               (p/then (fn [x] (fs/copyFileSync x (str "output/" (:file-prefix config) (:prebid-version config) ".js"))))
               (p/then (fn [] (.screenshot page #js {:path (str "output/" datetime "-prebid-config.png") :fullPage true})))
               (p/then (fn [] (fs/appendFileSync "output/log.edn" (str (assoc (into {} (dissoc config :headless :file-prefix)) :created-at datetime) "\n"))))
+              (p/then (fn [] (fs/writeFileSync "output/log.json" (.stringify js/JSON (clj->js (read-string (str (fs/readFileSync "output/log.edn"))))))))
               (p/then (fn [] (.close browser)))
               (p/then (fn [] (println "download complete - files saved to /output")))))
       (defp download-file
