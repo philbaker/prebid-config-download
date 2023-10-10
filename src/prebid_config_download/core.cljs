@@ -44,6 +44,19 @@
                    (.first)
                    (.setChecked true)))))
 
+    ; ; Check matched analytics checkboxes
+    (p/loop [x (dec (count (:analytics-adapters config)))]
+      (when (> x -1)
+        x
+        (p/recur (- x 1)
+                 (p/-> 
+                   (.locator
+                     (.locator page ".checkbox label" #js 
+                               {:has (.locator page (str "text=" (get (:analytics-adapters config) x)))})
+                     "input")
+                   (.first)
+                   (.setChecked true)))))
+
     ; Uncheck matched recommended module checkboxes
     (p/loop [x (dec (count (:recommended-modules-disable config)))]
       (when (> x -1)
@@ -71,7 +84,7 @@
                    (.setChecked true)))))
 
     ; Check matched user id modules
-    (p/loop [x (dec (count (:vendor-specific-modules config)))]
+    (p/loop [x (dec (count (:user-id-modules config)))]
       (when (> x -1)
         x
         (p/recur (- x 1)
