@@ -70,6 +70,19 @@
                    (.first)
                    (.setChecked false)))))
 
+    ; Check matched general module checkboxes
+    (p/loop [x (dec (count (:general-modules config)))]
+      (when (> x -1)
+        x
+        (p/recur (- x 1)
+                 (p/-> 
+                   (.locator
+                     (.locator page ".checkbox label" #js 
+                               {:has (.locator page (str "text=" (get (:general-modules config) x)))})
+                     "input")
+                   (.first)
+                   (.setChecked true)))))
+
     ; Check matched vendor specific module checkboxes
     (p/loop [x (dec (count (:vendor-specific-modules config)))]
       (when (> x -1)
