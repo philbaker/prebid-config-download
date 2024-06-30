@@ -29,6 +29,18 @@
                      (.first)
                      (.setChecked checked))))))
 
+(defn read-edn-file [file-path]
+  (let [content (fs/readFileSync file-path "utf8")]
+    (if (empty? content)
+      []
+      (read-string content))))
+
+(defn append-hash-map! [file-path config datetime]
+  (let [current-data (read-edn-file file-path)
+        new-data (assoc (into {} (dissoc config :headless :file-prefix)) :created-at datetime)
+        updated-data (conj current-data new-data)]
+    (fs/writeFileSync file-path (pr-str updated-data))))
+
 (defn download []
   (defletp
     ; Browser setup
@@ -83,7 +95,7 @@
               (p/then (fn [download] (.path download)))
               (p/then (fn [x] (fs/copyFileSync x (str "output/" (:file-prefix config) (:prebid-version config) ".js"))))
               (p/then (fn [] (.screenshot page #js {:path (str "output/" datetime "-prebid-config.png") :fullPage true})))
-              (p/then (fn [] (fs/appendFileSync "output/log.edn" (str (assoc (into {} (dissoc config :headless :file-prefix)) :created-at datetime) "\n"))))
+              (p/then (fn [] (append-hash-map! "output/log.edn" config datetime)))
               (p/then (fn [] (fs/writeFileSync "output/log.json" (.stringify js/JSON (clj->js (read-string (str (fs/readFileSync "output/log.edn"))))))))
               (p/then (fn [] (.close browser)))
               (p/then (fn [] (println "download complete - files saved to /output")))))
