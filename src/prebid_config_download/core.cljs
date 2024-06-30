@@ -1,7 +1,6 @@
 (ns prebid-config-download.core
   (:require ["playwright$default" :refer [chromium]]
             ["fs" :as fs]
-            [clojure.string :as str]
             [clojure.edn :refer [read-string]]
             [borkdude.deflet :refer [defletp defp]]
             [promesa.core :as p]))
@@ -20,6 +19,16 @@
 (def datetime (.toISOString (js/Date.)))
 (declare browser context page select-version x download-file download-event)
 
+(defn set-checkboxes [{:keys [page selector items checked]}]
+  (p/loop [x (dec (count items))]
+    (when (>= x 0)
+      (p/recur (dec x)
+               (p/-> (.locator (.locator page selector
+                                         #js {:has (.locator page (str "text=" (get items x)))})
+                               "input")
+                     (.first)
+                     (.setChecked checked))))))
+
 (defn download []
   (defletp
     ; Browser setup
@@ -32,82 +41,40 @@
                                (.selectOption (:prebid-version config))))
 
     ; Check matched adapter checkboxes
-    (p/loop [x (dec (count (:prebid-adapters config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".adapters .checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:prebid-adapters config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked true)))))
+    (set-checkboxes {:page page
+                     :selector ".adapters .checkbox label"
+                     :items (:prebid-adapters config)
+                     :checked true})
 
-    ; ; Check matched analytics checkboxes
-    (p/loop [x (dec (count (:analytics-adapters config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:analytics-adapters config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked true)))))
+    ; Check matched analytics checkboxes
+    (set-checkboxes {:page page
+                     :selector ".checkbox label"
+                     :items (:analytics-adapters config)
+                     :checked true})
 
     ; Uncheck matched recommended module checkboxes
-    (p/loop [x (dec (count (:recommended-modules-disable config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:recommended-modules-disable config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked false)))))
+    (set-checkboxes {:page page
+                     :selector ".checkbox label"
+                     :items (:recommended-modules-disable config)
+                     :checked false})
 
     ; Check matched general module checkboxes
-    (p/loop [x (dec (count (:general-modules config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:general-modules config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked true)))))
+    (set-checkboxes {:page page
+                     :selector ".checkbox label"
+                     :items (:general-modules config)
+                     :checked true})
 
     ; Check matched vendor specific module checkboxes
-    (p/loop [x (dec (count (:vendor-specific-modules config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:vendor-specific-modules config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked true)))))
+    (set-checkboxes {:page page
+                     :selector ".checkbox label"
+                     :items (:vendor-specific-modules config)
+                     :checked true})
 
     ; Check matched user id modules
-    (p/loop [x (dec (count (:user-id-modules config)))]
-      (when (> x -1)
-        x
-        (p/recur (- x 1)
-                 (p/-> 
-                   (.locator
-                     (.locator page ".checkbox label" #js 
-                               {:has (.locator page (str "text=" (get (:user-id-modules config) x)))})
-                     "input")
-                   (.first)
-                   (.setChecked true)))))
+    (set-checkboxes {:page page
+                     :selector ".checkbox label"
+                     :items (:user-id-modules config)
+                     :checked true})
 
     ; Download prebid file, take screenshot and append config info to logs
     (p/do 
