@@ -19,13 +19,13 @@
 (def datetime (.toISOString (js/Date.)))
 (declare browser context page select-version x download-file download-event)
 
-(defn set-checkboxes [{:keys [page selector items checked]}]
+(defn set-checkboxes [{:keys [page selector input-selector items checked]}]
   (p/loop [x (dec (count items))]
     (when (>= x 0)
       (p/recur (dec x)
                (p/-> (.locator (.locator page selector
                                          #js {:has (.locator page (str "text=" (get items x)))})
-                               "input")
+                               (str "input" input-selector))
                      (.first)
                      (.setChecked checked))))))
 
@@ -55,41 +55,47 @@
     ; Check matched adapter checkboxes
     (set-checkboxes {:page page
                      :selector ".adapters .checkbox label"
+                     :input-selector ""
                      :items (:prebid-adapters config)
                      :checked true})
 
     ; Check matched analytics checkboxes
     (set-checkboxes {:page page
                      :selector ".checkbox label"
+                     :input-selector ".analytics-check-box"
                      :items (:analytics-adapters config)
                      :checked true})
 
     ; Uncheck matched recommended module checkboxes
     (set-checkboxes {:page page
                      :selector ".checkbox label"
+                     :input-selector ""
                      :items (:recommended-modules-disable config)
                      :checked false})
 
     ; Check matched general module checkboxes
     (set-checkboxes {:page page
                      :selector ".checkbox label"
+                     :input-selector ""
                      :items (:general-modules config)
                      :checked true})
 
     ; Check matched vendor specific module checkboxes
     (set-checkboxes {:page page
                      :selector ".checkbox label"
+                     :input-selector ""
                      :items (:vendor-specific-modules config)
                      :checked true})
 
     ; Check matched user id modules
     (set-checkboxes {:page page
                      :selector ".checkbox label"
+                     :input-selector ""
                      :items (:user-id-modules config)
                      :checked true})
 
     ; Download prebid file, take screenshot and append config info to logs
-    (p/do 
+    (p/do
       (defp download-event
         (p/-> (.waitForEvent page "download")
               (p/then (fn [download] (.path download)))
