@@ -24,7 +24,7 @@
     (when (>= x 0)
       (p/recur (dec x)
                (p/-> (.locator (.locator page selector
-                                         #js {:has (.locator page (str "text=" (get items x)))})
+                                         #js {:has (.locator page (str "text=\"" (get items x) "\""))})
                                (str "input" input-selector))
                      (.first)
                      (.setChecked checked))))))
